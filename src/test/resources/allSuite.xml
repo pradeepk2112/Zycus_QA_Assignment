@@ -1,0 +1,20 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite thread-count="1" verbose="1" name="ZYCUS Interview Rest API Tests"
+	parallel="false" skipfailedinvocationcounts="false" junit="false"
+	data-provider-thread-count="1" annotations="JDK">
+
+	<test name="ZYCUS Interview test" annotations="JDK"
+		preserve-order="true">
+		<classes>
+			<class name="com.zycus.qa.interview.functional.Zycus_QA_AssignmentTest">
+				<class
+					name="com.zycus.qa.interview.functional.Zycus_QA_AssignmentTest_NegativeCases">
+					<!-- optional to run with only the methods the user want -->
+					<!-- <methods>
+						<include name="testEditReqHeader" />
+						<exclude name="getCustomerTest" />
+					</methods> -->
+				</class>
+		</classes>
+	</test>
+</suite>
