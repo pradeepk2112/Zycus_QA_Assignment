@@ -10,6 +10,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.testng.ITestResult;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 import org.json.*;
@@ -40,7 +41,7 @@ public class Zycus_QA_AssignmentTest_NegativeCases extends Zycus_QA_AssignmentTe
 		customerInfo.put("last_name", "hazard");
 		customerInfo.put("ssn_number", "902345671"); 
 		customerInfo.put("date_of_birth", "315532800");
-		CloseableHttpResponse response = restUtils.raiseNewCustomer(environment, port, Constant.createCustomerURI, customerInfo,true,true);
+		CloseableHttpResponse response = restUtils.raiseNewCustomer(environment, port, Constant.createCustomerURI, customerInfo,true,true,"");
 		delayPublish();
 		// testing with api given incorrectly
 		SoftAssert softAssert = new SoftAssert();
@@ -74,7 +75,7 @@ public class Zycus_QA_AssignmentTest_NegativeCases extends Zycus_QA_AssignmentTe
 		customerInfo.put("ssn_number", "902345671"); 
 		customerInfo.put("date_of_birth", "315532800");
 		customerInfo.put("weird_input", "xyz");
-		CloseableHttpResponse response = restUtils.raiseNewCustomer(environment, port, Constant.createCustomerURI, customerInfo,true,true);
+		CloseableHttpResponse response = restUtils.raiseNewCustomer(environment, port, Constant.createCustomerURI, customerInfo,true,true,"");
 		delayPublish();
 		SoftAssert softAssert = new SoftAssert();
 		softAssert.assertEquals(client_error, response.getStatusLine().toString());
@@ -104,7 +105,7 @@ public class Zycus_QA_AssignmentTest_NegativeCases extends Zycus_QA_AssignmentTe
 		customerInfo.put("last_name", "anderson");
 		customerInfo.put("ssn_number", customerInfo.get("ssn_number")); 
 		customerInfo.put("date_of_birth", "315532800");
-		CloseableHttpResponse response = restUtils.raiseNewCustomer(environment, port, Constant.createCustomerURI, customerInfo,true,true);
+		CloseableHttpResponse response = restUtils.raiseNewCustomer(environment, port, Constant.createCustomerURI, customerInfo,true,true,"");
 		delayPublish();
 		SoftAssert softAssert = new SoftAssert();
 		softAssert.assertEquals(expected_response, response.getStatusLine().toString());
@@ -133,10 +134,45 @@ public class Zycus_QA_AssignmentTest_NegativeCases extends Zycus_QA_AssignmentTe
 		customerInfo.put("last_name", "kompany");
 		customerInfo.put("ssn_number", customerInfo.get("ssn_number")); 
 		customerInfo.put("date_of_birth", "315532833");
-		CloseableHttpResponse response = restUtils.raiseNewCustomer(environment, port, Constant.createCustomerURI, customerInfo,true,false);
+		CloseableHttpResponse response = restUtils.raiseNewCustomer(environment, port, Constant.createCustomerURI, customerInfo,true,false,"");
 		delayPublish();
 		SoftAssert softAssert = new SoftAssert();
 		softAssert.assertEquals(remove_req_header, response.getStatusLine().toString());
+	}
+	
+	@Test(testName="")
+	public void testUnsupportedMediaType(ITestResult result) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, URISyntaxException, IOException, ParseException{
+		String methodName = result.getMethod().getMethodName();
+		customerInfo.put("first_name", "vincent");
+		customerInfo.put("last_name", "kompany");
+		customerInfo.put("ssn_number", customerInfo.get("ssn_number")); 
+		customerInfo.put("date_of_birth", "315532833");
+		CloseableHttpResponse response = restUtils.raiseNewCustomer(environment, port, Constant.createCustomerURI, customerInfo,true,true,methodName);
+		delayPublish();
+		SoftAssert softAssert = new SoftAssert();
+		softAssert.assertEquals(unsupported_Media_Type, response.getStatusLine().toString());
+		String readLine;
+		String responseBody = "";
+		BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+		if (response.getStatusLine().getStatusCode() == 415) {
+			while (((readLine = br.readLine()) != null)) {
+				responseBody += "\n" + readLine;
+			}
+		}
+		JSONParser parser = new JSONParser(); 
+		JSONObject jsonObject = (JSONObject) parser.parse(responseBody);
+		softAssert.assertEquals(unsupported_Media_Type_name, jsonObject.get("name").toString());
+		softAssert.assertEquals(unsupported_Media_Type_message, jsonObject.get("message").toString());
+		
+	}
+	
+	@Test(testName="")
+	public void testBadRequest() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, URISyntaxException, IOException, ParseException{
+		CloseableHttpResponse response = restUtils.getCustomerInfo(environment, port, Constant.getCustomerURI+"?customer_id="+newCustomer.get("person_id"),false);
+		delayPublish();
+		SoftAssert softAssert = new SoftAssert();
+		softAssert.assertEquals(bad_Request, response.getStatusLine().toString());
+		
 	}
 
 

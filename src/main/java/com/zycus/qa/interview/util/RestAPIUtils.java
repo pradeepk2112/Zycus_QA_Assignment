@@ -28,7 +28,7 @@ import org.apache.http.util.EntityUtils;
 public class RestAPIUtils {
 	Long timestamp_str = System.currentTimeMillis() / 1000L;
 
-	public CloseableHttpResponse raiseNewCustomer(String stageName, int port, String URI, Map<String, String> customerInfoMap, boolean status, boolean flag) throws URISyntaxException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException
+	public CloseableHttpResponse raiseNewCustomer(String stageName, int port, String URI, Map<String, String> customerInfoMap, boolean status, boolean flag, String methodName) throws URISyntaxException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException
 	{
 		HttpPost request;
 		CloseableHttpResponse response = null; 
@@ -41,8 +41,10 @@ public class RestAPIUtils {
 			request = createHttpPostRequest(stageName, port, URI);	
 		else
 			request = createWrongHttpPostRequest(stageName, port, URI+"addingrandom");	
-		if(flag)
+		if(flag&&methodName.equalsIgnoreCase(""))
 			response = publishToPostAPI(request, reqBody);
+		else if(flag&&methodName.equalsIgnoreCase("testUnsupportedMediaType")) 
+			response = publishToPostAPI(request, reqBody,flag,methodName);
 		else
 			response = publishToPostAPI(request, reqBody,flag);
 		System.out.println("Status:"+response.getStatusLine().toString());
@@ -73,6 +75,7 @@ public class RestAPIUtils {
 		});
 		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
 				builder.build(),SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+		request.addHeader("content-type", "application/json");
 		CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(
 				sslsf).build();
 		StringEntity params =new StringEntity(requestbody);
@@ -95,6 +98,29 @@ public class RestAPIUtils {
 		});
 		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
 				builder.build(),SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+		request.addHeader("content-type", "application/json");
+		CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(
+				sslsf).build();
+		StringEntity params =new StringEntity(requestbody);
+		request.setEntity(params);
+		CloseableHttpResponse res=httpclient.execute(request);
+		System.out.println(res);
+		return res;
+	}
+	
+	@SuppressWarnings("deprecation")
+	private static CloseableHttpResponse publishToPostAPI(HttpPost request, String requestbody, boolean flag, String methodName) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException, ClientProtocolException, IOException {
+		// Adding SSLContextBuilder & SSLConnectionSocketFactory to make https call & handling certificate issues
+		SSLContextBuilder builder = new SSLContextBuilder();
+		builder.loadTrustMaterial(null, new TrustStrategy(){
+			public boolean isTrusted(X509Certificate[] chain, String authType)
+					throws CertificateException {
+				return true;
+			}
+		});
+		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+				builder.build(),SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+		request.addHeader("content-type", "application/xml");
 		CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(
 				sslsf).build();
 		StringEntity params =new StringEntity(requestbody);
@@ -104,9 +130,13 @@ public class RestAPIUtils {
 		return res;
 	}
 
-	public CloseableHttpResponse getCustomerInfo(String stageName, int port, String URI) throws URISyntaxException, ParseException, IOException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException
+	public CloseableHttpResponse getCustomerInfo(String stageName, int port, String URI, boolean flag) throws URISyntaxException, ParseException, IOException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException
 	{
-		HttpGet request = createHttpGetRequest(stageName, port, URI);
+		HttpGet request = null;
+		if(flag)
+			request = createHttpGetRequest(stageName, port, URI);
+		else
+			request = createHttpGetRequest(stageName, port, URI,flag);
 		CloseableHttpResponse response = publishToGetAPI(request);
 		System.out.println("Status:"+response.getStatusLine().toString());
 		HttpEntity entity = response.getEntity();
@@ -116,6 +146,11 @@ public class RestAPIUtils {
 
 	private static HttpGet createHttpGetRequest(String appEndPoint, int appPort, String URI) throws URISyntaxException{
 		HttpGet request = new HttpGet(new URI("https://"+appEndPoint+":"+appPort+URI));
+		return request;		
+	}
+	
+	private static HttpGet createHttpGetRequest(String appEndPoint, int appPort, String URI, boolean status) throws URISyntaxException{
+		HttpGet request = new HttpGet(new URI("http://"+appEndPoint+":"+appPort+URI));
 		return request;		
 	}
 

@@ -12,5 +12,9 @@ public class Constant {
 	public final static String client_error = "500 Internal Server Error";
 	public final static String invalid_Resource = "404 Not Found";
 	public final static String bad_method = "405 Method Not Allowed";
+	public final static String unsupported_Media_Type = "415 Unsupported Media Type";
+	public final static String unsupported_Media_Type_name = "UNSUPPORTED_MEDIA_TYPE";
+	public final static String unsupported_Media_Type_message = "The request payload is not supported";
+	public final static String bad_Request = "400 Bad Request";
 
 }

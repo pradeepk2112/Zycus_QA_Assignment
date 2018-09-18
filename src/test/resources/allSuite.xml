@@ -6,15 +6,12 @@
 	<test name="ZYCUS Interview test" annotations="JDK"
 		preserve-order="true">
 		<classes>
-			<class name="com.zycus.qa.interview.functional.Zycus_QA_AssignmentTest">
-				<class
-					name="com.zycus.qa.interview.functional.Zycus_QA_AssignmentTest_NegativeCases">
-					<!-- optional to run with only the methods the user want -->
-					<!-- <methods>
-						<include name="testEditReqHeader" />
-						<exclude name="getCustomerTest" />
-					</methods> -->
-				</class>
+			<class name="com.zycus.qa.interview.functional.Zycus_QA_AssignmentTest" />
+			<class
+				name="com.zycus.qa.interview.functional.Zycus_QA_AssignmentTest_NegativeCases" />
+			<!-- optional to run with only the methods the user want -->
+			<!-- <methods> <include name="testEditReqHeader" /> <exclude name="getCustomerTest" 
+				/> </methods> -->
 		</classes>
 	</test>
 </suite>
