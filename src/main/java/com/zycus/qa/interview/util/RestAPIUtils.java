@@ -130,13 +130,15 @@ public class RestAPIUtils {
 		return res;
 	}
 
-	public CloseableHttpResponse getCustomerInfo(String stageName, int port, String URI, boolean flag) throws URISyntaxException, ParseException, IOException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException
+	public CloseableHttpResponse getCustomerInfo(String stageName, int port, String URI, boolean flag, String methodName) throws URISyntaxException, ParseException, IOException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException
 	{
 		HttpGet request = null;
-		if(flag)
+		if(flag && methodName.equalsIgnoreCase(""))
 			request = createHttpGetRequest(stageName, port, URI);
-		else
+		else if(!flag && methodName.equalsIgnoreCase(""))
 			request = createHttpGetRequest(stageName, port, URI,flag);
+		else
+			request = createHttpGetRequest(stageName, port, URI,flag, methodName);
 		CloseableHttpResponse response = publishToGetAPI(request);
 		System.out.println("Status:"+response.getStatusLine().toString());
 		HttpEntity entity = response.getEntity();
@@ -151,6 +153,11 @@ public class RestAPIUtils {
 	
 	private static HttpGet createHttpGetRequest(String appEndPoint, int appPort, String URI, boolean status) throws URISyntaxException{
 		HttpGet request = new HttpGet(new URI("http://"+appEndPoint+":"+appPort+URI));
+		return request;		
+	}
+	
+	private static HttpGet createHttpGetRequest(String appEndPoint, int appPort, String URI, boolean status, String methodName) throws URISyntaxException{
+		HttpGet request = new HttpGet(new URI("ftp://"+appEndPoint+":"+appPort+URI));
 		return request;		
 	}
 

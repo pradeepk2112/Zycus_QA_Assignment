@@ -115,7 +115,7 @@ public class Zycus_QA_AssignmentTest extends Constant {
 	public void getCustomerTest() throws KeyManagementException, ParseException, NoSuchAlgorithmException, KeyStoreException, URISyntaxException, IOException, org.json.simple.parser.ParseException{
 		// Get method, adding the customer id which got created from the above customer test method
 		// adding it from the map reference
-		CloseableHttpResponse response = restUtils.getCustomerInfo(environment, port, Constant.getCustomerURI+"?customer_id="+newCustomer.get("person_id"),true);
+		CloseableHttpResponse response = restUtils.getCustomerInfo(environment, port, Constant.getCustomerURI+"?customer_id="+newCustomer.get("person_id"),true,"");
 		delayPublish();
 		SoftAssert softAssert = new SoftAssert();
 		softAssert.assertEquals(expected_response, response.getStatusLine().toString().contains("200 OK"));

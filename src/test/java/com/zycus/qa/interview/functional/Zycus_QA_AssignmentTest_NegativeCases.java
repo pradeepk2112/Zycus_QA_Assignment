@@ -139,7 +139,7 @@ public class Zycus_QA_AssignmentTest_NegativeCases extends Zycus_QA_AssignmentTe
 		SoftAssert softAssert = new SoftAssert();
 		softAssert.assertEquals(remove_req_header, response.getStatusLine().toString());
 	}
-	
+
 	@Test(testName="")
 	public void testUnsupportedMediaType(ITestResult result) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, URISyntaxException, IOException, ParseException{
 		String methodName = result.getMethod().getMethodName();
@@ -163,16 +163,32 @@ public class Zycus_QA_AssignmentTest_NegativeCases extends Zycus_QA_AssignmentTe
 		JSONObject jsonObject = (JSONObject) parser.parse(responseBody);
 		softAssert.assertEquals(unsupported_Media_Type_name, jsonObject.get("name").toString());
 		softAssert.assertEquals(unsupported_Media_Type_message, jsonObject.get("message").toString());
-		
+
 	}
-	
+
 	@Test(testName="")
 	public void testBadRequest() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, URISyntaxException, IOException, ParseException{
-		CloseableHttpResponse response = restUtils.getCustomerInfo(environment, port, Constant.getCustomerURI+"?customer_id="+newCustomer.get("person_id"),false);
+		CloseableHttpResponse response = restUtils.getCustomerInfo(environment, port, Constant.getCustomerURI+"?customer_id="+newCustomer.get("person_id"),false,"");
 		delayPublish();
 		SoftAssert softAssert = new SoftAssert();
 		softAssert.assertEquals(bad_Request, response.getStatusLine().toString());
-		
+
+	}
+
+	// this test case is making a ftp call to the service instead of http or https, no response state will be returned
+	// here response will take time, as its been hit from a different protocol, so that's why delay publish is in a loop
+	@Test(expectedExceptions=NullPointerException.class)
+	public void testNoResponse(ITestResult result) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, URISyntaxException, IOException, ParseException{
+		String methodName = result.getMethod().getMethodName();
+		CloseableHttpResponse response = restUtils.getCustomerInfo(environment, port, Constant.getCustomerURI+"?customer_id="+newCustomer.get("person_id"),true,methodName);
+		int i=0;
+		while(i<=2){
+			delayPublish();
+			i++;
+		}
+		SoftAssert softAssert = new SoftAssert();
+		softAssert.assertNull(response.getStatusLine().toString());
+
 	}
 
 
